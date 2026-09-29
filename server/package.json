@@ -1,0 +1,24 @@
+{
+	"name": "shoppingcart",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"dev": "nodemon --env-file-if-exists=.env index.js",
+		"seed": "nodemon --env-file-if-exists=.env db/seed.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "commonjs",
+	"devDependencies": {
+		"nodemon": "^3.1.14"
+	},
+	"dependencies": {
+		"@supabase/supabase-js": "^2.116.0",
+		"cors": "^2.8.6",
+		"express": "^5.2.1",
+		"morgan": "^1.12.1"
+	}
+}
