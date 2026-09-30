@@ -18,15 +18,7 @@ const getPaginationParams = require('./lib/pagination');
 
 app.get('/api/products', async (req, res) => {
   const { limit: rawLimit, page: rawPage } = req.query;
-
-  let params;
-  try  {
-    params = getPaginationParams(rawLimit, rawPage);
-  } catch (err) {
-    return res.status(400).json({ error: err.message })
-  }
-
-  const { limit, page } = params;
+  const { limit, page } = getPaginationParams(rawLimit, rawPage);
 
   try {
     const { products, total } = await getProducts(limit, page);
