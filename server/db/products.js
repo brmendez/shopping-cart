@@ -1,4 +1,5 @@
 const supabase = require('../lib/supabase');
+const { PAGE_OUT_OF_RANGE } = require('../lib/dbErrorCodes');
 
 async function getProducts(limit, page) {
   const offset = (page - 1) * limit;
@@ -14,7 +15,7 @@ async function getProducts(limit, page) {
     .range(offset, offset + limit - 1);
 
   if (retrieveError) {
-    if (retrieveError.code === 'PGRST103') {
+    if (retrieveError.code === PAGE_OUT_OF_RANGE) {
       const { error: countError, count: total } = await supabase
         .from('products')
         .select('*', { count: 'exact', head: true });
