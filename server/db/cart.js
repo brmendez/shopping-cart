@@ -13,6 +13,30 @@ async function addToCart(cartId, productId, quantity) {
   return getCart(cartId);
 }
 
+async function setQuantity(cartId, productId, quantity) {
+  const { error } = await supabaseAdmin.rpc('set_cart_quantity', {
+    p_cart_id: cartId,
+    p_product_id: productId,
+    p_quantity: quantity,
+  });
+
+  if (error) throw error;
+
+  return getCart(cartId);
+}
+
+async function removeFromCart(cartId, productId) {
+  const { error } = await supabaseAdmin
+    .from('cart_items')
+    .delete()
+    .eq('cart_id', cartId)
+    .eq('product_id', productId);
+
+  if (error) throw error;
+
+  return getCart(cartId);
+}
+
 async function getCart(cartId) {
   const { error, data } = await supabaseAdmin
     .from('cart_items')
@@ -25,4 +49,4 @@ async function getCart(cartId) {
   return data;
 }
 
-module.exports = { addToCart, getCart };
+module.exports = { addToCart, setQuantity, removeFromCart, getCart };
