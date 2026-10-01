@@ -1,15 +1,9 @@
 const { supabaseAdmin } = require('../lib/supabaseAdmin');
 const { PRODUCTS } = require('./productsAPISeed');
 
+// Upsert by title so product IDs stay stable and carts survive a re-seed.
 async function seed() {
-	const { error: deleteError } = await supabaseAdmin
-		.from('products')
-		.delete()
-		.neq('id', 0);
-
-	if (deleteError) throw deleteError;
-
-	const { error: insertError } = await supabaseAdmin.from('products').insert(
+	const { error: upsertError } = await supabaseAdmin.from('products').upsert(
 		Object.values(PRODUCTS.products).map((product) => ({
 			title: product.title,
 			stock: product.stock,
@@ -18,10 +12,11 @@ async function seed() {
 			price: product.price,
 			images: product.images,
 			thumbnail: product.thumbnail,
-		}))
+		})),
+		{ onConflict: 'title' }
 	);
 
-	if (insertError) throw insertError;
+	if (upsertError) throw upsertError;
 
 	console.log(`Seeded ${PRODUCTS.products.length} products.`);
 }
