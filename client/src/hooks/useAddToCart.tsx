@@ -1,5 +1,3 @@
-import type { Product } from "../types";
-
 const CART_ID_KEY = 'cartId';
 
 // One random cart per browser until we have real users.
@@ -16,7 +14,7 @@ const getCartId = () => {
 
 export const useAddToCart = () => {
 
-  const addToCart = async (product: Product) => {
+  const addToCart = async (productId: number) => {
       const res = await fetch('http://localhost:3001/api/cart/add', {
         method: 'POST',
         headers: {
@@ -24,7 +22,7 @@ export const useAddToCart = () => {
         },
         body: JSON.stringify({
           cartId: getCartId(),
-          productId: product.id,
+          productId,
           quantity: 1,
         }),
       });

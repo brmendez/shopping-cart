@@ -1,38 +1,34 @@
 export type Product = {
   id: number;
   title: string;
-  description: string;
-  category: string;
   price: number;
-  discountPercentage: number;
-  rating: number;
   stock: number;
-  tags: string[];
-  brand: string;
-  sku: string;
-  weight: number;
-  dimensions: {
-    width: number;
-    height: number;
-    depth: number;
-  };
-  warrantyInformation: string;
-  shippingInformation: string;
-  availabilityStatus: string;
-  images: string[];
   thumbnail: string;
-  reviews: {
-    rating: number;
-    comment: string;
-    date: string;
-    reviewerName: string;
-    reviewerEmail: string;
-  }[];
-}
+};
 
-export interface ProductsResponse {
+export type ProductsResponse = {
   products: Product[];
   total: number;
-  skip: number;
   limit: number;
-}
+  page: number;
+  nextRestockAt: string;
+};
+
+export type CartItem = {
+  product_id: number;
+  quantity: number;
+  products: Pick<Product, 'title' | 'price' | 'thumbnail'>;
+};
+
+export type Order = {
+  id: number;
+  total: number;
+  status: 'pending' | 'paid';
+  created_at: string;
+  order_items: {
+    product_id: number;
+    title: string;
+    unit_price: number;
+    quantity: number;
+  }[];
+};
