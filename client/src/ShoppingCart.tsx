@@ -14,11 +14,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { useCart } from './hooks/useCart';
-
-const formatPrice = (price: number) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-    price
-  );
+import { formatPrice } from '@/lib/formatPrice';
 
 export const ShoppingCart = () => {
   const {

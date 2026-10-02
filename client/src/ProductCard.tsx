@@ -2,17 +2,13 @@ import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Product } from './types';
+import { formatPrice } from '@/lib/formatPrice';
 
 type ProductProps = {
   product: Product;
   onClick: (productId: number) => Promise<void>;
   disabled: boolean;
 };
-
-const formatPrice = (price: number) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-    price
-  );
 
 export const ProductCard = ({ product, onClick, disabled }: ProductProps) => {
   const [adding, setAdding] = useState(false);
