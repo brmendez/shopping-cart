@@ -101,7 +101,7 @@ begin
 end;
 $$;
 
--- Sets a cart line's quantity. Fails if it would exceed stock.
+-- Sets a cart line's quantity. Only checks stock when the quantity goes up.
 create function public.set_cart_quantity(p_cart_id uuid, p_product_id integer, p_quantity integer)
 returns void
 language plpgsql
@@ -109,22 +109,30 @@ set search_path = ''
 as $$
 declare
   v_stock integer;
+  v_old_quantity integer;
 begin
-  update public.cart_items
-  set quantity = p_quantity
+  select quantity into v_old_quantity
+  from public.cart_items
   where cart_id = p_cart_id and product_id = p_product_id;
 
   if not found then
     raise exception 'Item not in cart' using errcode = 'P0002';
   end if;
 
-  select coalesce(stock, 0) into v_stock
-  from public.products
-  where id = p_product_id;
+  -- Lowering a quantity is always allowed; only increases need stock.
+  if p_quantity > v_old_quantity then
+    select coalesce(stock, 0) into v_stock
+    from public.products
+    where id = p_product_id;
 
-  if p_quantity > v_stock then
-    raise exception 'Only % left in stock', v_stock using errcode = 'P0001';
+    if p_quantity > v_stock then
+      raise exception 'Only % left in stock', v_stock using errcode = 'P0001';
+    end if;
   end if;
+
+  update public.cart_items
+  set quantity = p_quantity
+  where cart_id = p_cart_id and product_id = p_product_id;
 end;
 $$;
 
