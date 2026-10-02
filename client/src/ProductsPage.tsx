@@ -1,13 +1,19 @@
+import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from './hooks/useCart';
 import { useProducts } from './hooks/useProducts';
 import { ProductCard } from './ProductCard';
+import { ProductDetailSheet } from './ProductDetailSheet';
 
 export const ProductsPage = () => {
   const { products, page, totalPages, nextPage, prevPage } = useProducts();
 
   const { addToCart, loading } = useCart();
+
+  // Store the id, not the product, so the sheet always shows the latest loaded data.
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const selectedProduct = products.find((p) => p.id === selectedId) ?? null;
 
   return (
     <>
@@ -25,6 +31,7 @@ export const ProductsPage = () => {
             key={p.id}
             product={p}
             onClick={addToCart}
+            onSelect={setSelectedId}
             disabled={loading}
           />
         ))}
@@ -55,6 +62,10 @@ export const ProductsPage = () => {
           <ChevronRight />
         </Button>
       </nav>
+      <ProductDetailSheet
+        product={selectedProduct}
+        onClose={() => setSelectedId(null)}
+      />
     </>
   );
 };

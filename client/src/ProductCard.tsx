@@ -8,10 +8,16 @@ import { getStockStatus } from '@/lib/stockStatus';
 type ProductProps = {
   product: Product;
   onClick: (productId: number) => Promise<void>;
+  onSelect: (productId: number) => void;
   disabled: boolean;
 };
 
-export const ProductCard = ({ product, onClick, disabled }: ProductProps) => {
+export const ProductCard = ({
+  product,
+  onClick,
+  onSelect,
+  disabled,
+}: ProductProps) => {
   const [adding, setAdding] = useState(false);
   const status = getStockStatus(product.stock);
   const soldOut = status === 'sold-out';
@@ -27,7 +33,12 @@ export const ProductCard = ({ product, onClick, disabled }: ProductProps) => {
 
   return (
     <article className="group flex flex-col">
-      <div className="relative aspect-square overflow-hidden rounded-xl bg-muted">
+      <button
+        type="button"
+        onClick={() => onSelect(product.id)}
+        aria-label={`View ${product.title}`}
+        className="relative block aspect-square cursor-pointer overflow-hidden rounded-xl bg-muted"
+      >
         {status !== 'in-stock' && (
           <span className="absolute top-3 left-3 z-10 rounded-full bg-rose-soft px-2.5 py-1 text-xs font-medium text-rose-foreground">
             {soldOut ? 'Sold out' : 'Low stock'}
@@ -39,7 +50,7 @@ export const ProductCard = ({ product, onClick, disabled }: ProductProps) => {
           loading="lazy"
           className={`size-full object-contain p-6 transition-transform duration-300 ease-out group-hover:scale-[1.04] motion-reduce:transition-none ${soldOut ? 'opacity-50' : ''}`}
         />
-      </div>
+      </button>
       <p className="mt-4 text-xs text-muted-foreground capitalize">
         {product.category}
       </p>
@@ -48,7 +59,13 @@ export const ProductCard = ({ product, onClick, disabled }: ProductProps) => {
           title={product.title}
           className="line-clamp-2 min-h-[2.75em] text-[15px] leading-snug font-medium"
         >
-          {product.title}
+          <button
+            type="button"
+            onClick={() => onSelect(product.id)}
+            className="cursor-pointer text-left"
+          >
+            {product.title}
+          </button>
         </h2>
         <p className="text-[15px] leading-snug text-muted-foreground tabular-nums">
           {formatPrice(product.price)}
