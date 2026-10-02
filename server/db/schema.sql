@@ -65,7 +65,7 @@ create table public.restock_settings (
   interval_minutes integer not null check (interval_minutes > 0),
   last_restocked_at timestamptz
 );
-insert into public.restock_settings (interval_minutes) values (5);
+insert into public.restock_settings (interval_minutes) values (2);
 
 alter table public.restock_settings enable row level security;
 
