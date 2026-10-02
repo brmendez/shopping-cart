@@ -2,16 +2,22 @@ import { useState, useEffect } from 'react';
 import type { Product, ProductsResponse } from '../types';
 
 const PAGE_SIZE = 4;
+// Wait a moment past the restock time so the database has finished restocking.
+const RESTOCK_BUFFER_MS = 2000;
+// Never reload more often than this, even if the restock time has already passed.
+const MIN_RELOAD_DELAY_MS = 5000;
 
 // Reads ?page= from the URL, falling back to 1.
 const getPageFromUrl = () =>
   Math.max(1, Number(new URLSearchParams(window.location.search).get('page')) || 1);
 
-export const useProducts = () => {
+// refreshKey: change it to reload the current page (e.g. after stock changes).
+export const useProducts = (refreshKey: number) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState(getPageFromUrl);
   const [total, setTotal] = useState(0);
   const [nextRestockAt, setNextRestockAt] = useState<string | null>(null);
+  const [restockTick, setRestockTick] = useState(0);
 
   // Keeps the URL in sync so refresh and shared links land on the same page.
   useEffect(() => {
@@ -42,7 +48,22 @@ export const useProducts = () => {
     };
 
     getProducts();
-  }, [page]);
+  }, [page, refreshKey, restockTick]);
+
+  // Reload once the next restock lands, so sold-out items come back on their own.
+  useEffect(() => {
+    if (!nextRestockAt) {
+      return;
+    }
+
+    const delay = Math.max(
+      new Date(nextRestockAt).getTime() - Date.now() + RESTOCK_BUFFER_MS,
+      MIN_RELOAD_DELAY_MS
+    );
+    const timer = setTimeout(() => setRestockTick((t) => t + 1), delay);
+
+    return () => clearTimeout(timer);
+  }, [nextRestockAt]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 

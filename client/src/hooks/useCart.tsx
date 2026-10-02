@@ -6,6 +6,7 @@ type CartContextValue = {
   loading: boolean;
   error: string | null;
   order: Order | null;
+  stockVersion: number;
   addToCart: (productId: number) => Promise<void>;
   updateQuantity: (productId: number, quantity: number) => Promise<void>;
   removeFromCart: (productId: number) => Promise<void>;

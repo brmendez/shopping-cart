@@ -22,6 +22,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [order, setOrder] = useState<Order | null>(null);
+  // Goes up whenever stock is known to have changed, so the product list can reload.
+  const [stockVersion, setStockVersion] = useState(0);
 
   // Cart endpoints answer with { cart }, checkout with { order }, failures with { error }.
   const request = async (url: string, init?: RequestInit) => {
@@ -38,6 +40,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
       if (!res.ok) {
         setError(data.error ?? 'Something went wrong');
+
+        // 409 means stock moved under us (e.g. someone else bought it).
+        if (res.status === 409) {
+          setStockVersion((v) => v + 1);
+        }
         return;
       }
 
@@ -47,6 +54,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       if (data.order) {
         setOrder(data.order);
         setCart([]);
+        setStockVersion((v) => v + 1);
       }
     } catch {
       setError('Could not reach the server');
@@ -88,7 +96,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <CartContext.Provider
-      value={{ cart, loading, error, order, addToCart, updateQuantity, removeFromCart, checkout }}
+      value={{
+        cart,
+        loading,
+        error,
+        order,
+        stockVersion,
+        addToCart,
+        updateQuantity,
+        removeFromCart,
+        checkout,
+      }}
     >
       {children}
     </CartContext.Provider>

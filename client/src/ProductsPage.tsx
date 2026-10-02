@@ -7,9 +7,10 @@ import { ProductCard } from './ProductCard';
 import { ProductDetailSheet } from './ProductDetailSheet';
 
 export const ProductsPage = () => {
-  const { products, page, totalPages, nextPage, prevPage } = useProducts();
+  const { addToCart, loading, stockVersion } = useCart();
 
-  const { addToCart, loading } = useCart();
+  const { products, page, totalPages, nextPage, prevPage } =
+    useProducts(stockVersion);
 
   // Store the id, not the product, so the sheet always shows the latest loaded data.
   const [selectedId, setSelectedId] = useState<number | null>(null);
