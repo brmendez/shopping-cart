@@ -1,17 +1,17 @@
-import { useAddToCart } from './hooks/useAddToCart';
+import { useCart } from './hooks/useCart';
 import { useProducts } from './hooks/useProducts';
 import { ProductCard } from './ProductCard';
 
 export const ProductsPage = () => {
   const { products, page, totalPages, nextPage, prevPage } = useProducts();
 
-  const { addToCart } = useAddToCart();
+  const { addToCart, loading } = useCart();
 
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {products.map((p) => (
-          <ProductCard key={p.id} product={p} onClick={addToCart} />
+          <ProductCard key={p.id} product={p} onClick={addToCart} disabled={loading} />
         ))}
       </div>
       <button onClick={prevPage} disabled={page === 1}>
