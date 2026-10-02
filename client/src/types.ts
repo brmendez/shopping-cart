@@ -15,6 +15,8 @@ export type ProductsResponse = {
   limit: number;
   page: number;
   nextRestockAt: string;
+  // Products that start tiny and sell out, featured in the hero.
+  scarce: Product[];
 };
 
 export type CartItem = {

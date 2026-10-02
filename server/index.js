@@ -12,7 +12,7 @@ app.use(express.json());
 const morgan = require('morgan');
 app.use(morgan('dev'));
 
-const getProducts = require('./db/products');
+const { getProducts, getScarceProducts } = require('./db/products');
 const getPaginationParams = require('./lib/pagination');
 const getNextRestockAt = require('./db/restock');
 const {
@@ -29,8 +29,9 @@ app.get('/api/products', async (req, res) => {
   const { limit, page } = getPaginationParams(rawLimit, rawPage);
 
   try {
-    const [{ products, total }, nextRestockAt] = await Promise.all([
+    const [{ products, total }, scarce, nextRestockAt] = await Promise.all([
       getProducts(limit, page),
+      getScarceProducts(),
       getNextRestockAt(),
     ]);
 
@@ -40,6 +41,7 @@ app.get('/api/products', async (req, res) => {
       total,
       page,
       nextRestockAt,
+      scarce,
     });
   } catch (err) {
     console.error(err);

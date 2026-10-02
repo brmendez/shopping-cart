@@ -17,6 +17,7 @@ export const useProducts = (refreshKey: number) => {
   const [page, setPage] = useState(getPageFromUrl);
   const [total, setTotal] = useState(0);
   const [nextRestockAt, setNextRestockAt] = useState<string | null>(null);
+  const [scarce, setScarce] = useState<Product[]>([]);
   const [restockTick, setRestockTick] = useState(0);
 
   // Keeps the URL in sync so refresh and shared links land on the same page.
@@ -45,6 +46,7 @@ export const useProducts = (refreshKey: number) => {
       setProducts(data.products);
       setTotal(data.total);
       setNextRestockAt(data.nextRestockAt);
+      setScarce(data.scarce);
     };
 
     getProducts();
@@ -73,6 +75,7 @@ export const useProducts = (refreshKey: number) => {
     totalPages,
     total,
     nextRestockAt,
+    scarce,
     nextPage: () => setPage((p) => Math.min(p + 1, totalPages)),
     prevPage: () => setPage((p) => Math.max(p - 1, 1)),
   };
