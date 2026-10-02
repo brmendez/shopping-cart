@@ -23,6 +23,12 @@
   --input: oklch(0.91 0.004 85);
   --ring: oklch(0.16 0.005 85);
   --radius: 0.75rem;
+  /* Dusty rose marks urgency (low and sold-out stock); teal is kept for the restock drop. */
+  --rose: #c98b83;
+  --rose-soft: #f6e4e1;
+  --rose-foreground: #7e3a33;
+  --teal: #2f5d5a;
+  --teal-foreground: #ffffff;
 }
 
 @theme inline {
@@ -33,6 +39,11 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-rose: var(--rose);
+  --color-rose-soft: var(--rose-soft);
+  --color-rose-foreground: var(--rose-foreground);
+  --color-teal: var(--teal);
+  --color-teal-foreground: var(--teal-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
