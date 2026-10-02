@@ -3,6 +3,7 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Product } from './types';
 import { formatPrice } from '@/lib/formatPrice';
+import { formatCountdown } from '@/lib/formatCountdown';
 import { getStockStatus } from '@/lib/stockStatus';
 
 type ProductProps = {
@@ -10,6 +11,8 @@ type ProductProps = {
   onClick: (productId: number) => Promise<void>;
   onSelect: (productId: number) => void;
   disabled: boolean;
+  // Seconds until the next restock, shown on sold-out items.
+  restockIn: number | null;
 };
 
 export const ProductCard = ({
@@ -17,6 +20,7 @@ export const ProductCard = ({
   onClick,
   onSelect,
   disabled,
+  restockIn,
 }: ProductProps) => {
   const [adding, setAdding] = useState(false);
   const status = getStockStatus(product.stock);
@@ -42,6 +46,9 @@ export const ProductCard = ({
         {status !== 'in-stock' && (
           <span className="absolute top-3 left-3 z-10 rounded-full bg-rose-soft px-2.5 py-1 text-xs font-medium text-rose-foreground">
             {soldOut ? 'Sold out' : 'Low stock'}
+            {soldOut && restockIn !== null && (
+              <> · back in {formatCountdown(restockIn)}</>
+            )}
           </span>
         )}
         <img

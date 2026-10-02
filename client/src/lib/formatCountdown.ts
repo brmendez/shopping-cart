@@ -1,0 +1,3 @@
+// Formats seconds as m:ss, e.g. 252 -> "4:12".
+export const formatCountdown = (seconds: number) =>
+  `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;

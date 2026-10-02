@@ -2,15 +2,18 @@ import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from './hooks/useCart';
+import { useCountdown } from './hooks/useCountdown';
 import { useProducts } from './hooks/useProducts';
+import { formatCountdown } from '@/lib/formatCountdown';
 import { ProductCard } from './ProductCard';
 import { ProductDetailSheet } from './ProductDetailSheet';
 
 export const ProductsPage = () => {
   const { addToCart, loading, stockVersion } = useCart();
 
-  const { products, page, totalPages, nextPage, prevPage } =
+  const { products, page, totalPages, nextPage, prevPage, nextRestockAt } =
     useProducts(stockVersion);
+  const restockIn = useCountdown(nextRestockAt);
 
   // Store the id, not the product, so the sheet always shows the latest loaded data.
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -25,6 +28,11 @@ export const ProductsPage = () => {
         <p className="mt-2 text-sm text-muted-foreground">
           A little of everything, restocked every five minutes.
         </p>
+        {restockIn !== null && (
+          <p className="mt-2 text-sm tabular-nums">
+            Next drop in {formatCountdown(restockIn)}
+          </p>
+        )}
       </div>
       <div className="grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4 lg:gap-x-6">
         {products.map((p) => (
@@ -34,6 +42,7 @@ export const ProductsPage = () => {
             onClick={addToCart}
             onSelect={setSelectedId}
             disabled={loading}
+            restockIn={restockIn}
           />
         ))}
       </div>
@@ -66,6 +75,7 @@ export const ProductsPage = () => {
       <ProductDetailSheet
         product={selectedProduct}
         onClose={() => setSelectedId(null)}
+        restockIn={restockIn}
       />
     </>
   );

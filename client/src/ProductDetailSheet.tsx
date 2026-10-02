@@ -9,6 +9,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { formatPrice } from '@/lib/formatPrice';
+import { formatCountdown } from '@/lib/formatCountdown';
 import { getStockStatus } from '@/lib/stockStatus';
 import { useCart } from './hooks/useCart';
 import { ProductGallery } from './ProductGallery';
@@ -17,12 +18,15 @@ import type { Product } from './types';
 type ProductDetailSheetProps = {
   product: Product | null;
   onClose: () => void;
+  // Seconds until the next restock, shown when sold out.
+  restockIn: number | null;
 };
 
 // Slide-over with one product's details. Open whenever a product is passed in.
 export const ProductDetailSheet = ({
   product,
   onClose,
+  restockIn,
 }: ProductDetailSheetProps) => {
   const { addToCart, loading, error } = useCart();
   const [adding, setAdding] = useState(false);
@@ -75,6 +79,9 @@ export const ProductDetailSheet = ({
               {soldOut && (
                 <p className="mt-3 inline-block rounded-full bg-rose-soft px-2.5 py-1 text-xs font-medium text-rose-foreground">
                   Sold out
+                  {restockIn !== null && (
+                    <> — back in {formatCountdown(restockIn)}</>
+                  )}
                 </p>
               )}
               <SheetDescription className="mt-5 text-[15px] leading-relaxed">
