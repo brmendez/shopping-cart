@@ -44,10 +44,17 @@ export const ProductCard = ({
         className="relative block aspect-square cursor-pointer overflow-hidden rounded-xl bg-muted outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         {status !== 'in-stock' && (
-          <span className="absolute top-3 left-3 z-10 rounded-full bg-rose-soft px-2.5 py-1 text-xs font-medium text-rose-foreground">
-            {soldOut ? 'Sold out' : 'Low stock'}
+          <span className="absolute top-3 left-3 z-10 rounded-full bg-rose-soft px-2.5 py-1 text-xs font-medium whitespace-nowrap text-rose-foreground tabular-nums">
+            {!soldOut && 'Low stock'}
+            {soldOut && restockIn === null && 'Sold out'}
             {soldOut && restockIn !== null && (
-              <> · back in {formatCountdown(restockIn)}</>
+              <>
+                {/* On narrow cards the faded image and button already say sold out. */}
+                <span className="hidden sm:inline">Sold out · </span>
+                {restockIn === 0
+                  ? 'Restocking…'
+                  : `Back in ${formatCountdown(restockIn)}`}
+              </>
             )}
           </span>
         )}

@@ -21,20 +21,26 @@ export const ProductsPage = () => {
 
   return (
     <>
-      <div className="pt-10 pb-8 sm:pt-14 sm:pb-10">
-        <h1 className="text-4xl font-semibold tracking-tighter sm:text-5xl">
-          Shop all
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+      <section className="mt-6 flex flex-col gap-6 rounded-2xl bg-teal px-6 py-7 text-teal-foreground sm:mt-8 sm:flex-row sm:items-end sm:justify-between sm:px-10 sm:py-9">
+        <h1 className="max-w-xl text-3xl leading-[1.05] font-semibold tracking-tighter sm:text-4xl">
           A little of everything, restocked every five minutes.
-        </p>
+        </h1>
         {restockIn !== null && (
-          <p className="mt-2 text-sm tabular-nums">
-            Next drop in {formatCountdown(restockIn)}
-          </p>
+          <div className="sm:text-right">
+            <p className="flex items-center gap-2 text-xs font-medium tracking-wide uppercase opacity-80 sm:justify-end">
+              <span className="size-1.5 rounded-full bg-teal-foreground motion-safe:animate-pulse" />
+              {restockIn === 0 ? 'Restocking' : 'Next drop in'}
+            </p>
+            <p
+              aria-live="off"
+              className="mt-1 text-5xl leading-none font-semibold tracking-tighter tabular-nums sm:text-6xl"
+            >
+              {restockIn === 0 ? '…' : formatCountdown(restockIn)}
+            </p>
+          </div>
         )}
-      </div>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4 lg:gap-x-6">
+      </section>
+      <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:mt-10 lg:grid-cols-4 lg:gap-x-6">
         {products.map((p) => (
           <ProductCard
             key={p.id}

@@ -77,10 +77,15 @@ export const ProductDetailSheet = ({
                 </p>
               )}
               {soldOut && (
-                <p className="mt-3 inline-block rounded-full bg-rose-soft px-2.5 py-1 text-xs font-medium text-rose-foreground">
+                <p className="mt-3 inline-block rounded-full bg-rose-soft px-2.5 py-1 text-xs font-medium text-rose-foreground tabular-nums">
                   Sold out
                   {restockIn !== null && (
-                    <> — back in {formatCountdown(restockIn)}</>
+                    <>
+                      {' · '}
+                      {restockIn === 0
+                        ? 'Restocking…'
+                        : `Back in ${formatCountdown(restockIn)}`}
+                    </>
                   )}
                 </p>
               )}
