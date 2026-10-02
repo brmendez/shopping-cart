@@ -37,7 +37,7 @@ export const ProductCard = ({
         type="button"
         onClick={() => onSelect(product.id)}
         aria-label={`View ${product.title}`}
-        className="relative block aspect-square cursor-pointer overflow-hidden rounded-xl bg-muted"
+        className="relative block aspect-square cursor-pointer overflow-hidden rounded-xl bg-muted outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         {status !== 'in-stock' && (
           <span className="absolute top-3 left-3 z-10 rounded-full bg-rose-soft px-2.5 py-1 text-xs font-medium text-rose-foreground">
@@ -62,7 +62,7 @@ export const ProductCard = ({
           <button
             type="button"
             onClick={() => onSelect(product.id)}
-            className="cursor-pointer text-left"
+            className="cursor-pointer rounded-sm text-left outline-none decoration-1 underline-offset-4 transition-colors hover:underline focus-visible:underline focus-visible:ring-2 focus-visible:ring-ring"
           >
             {product.title}
           </button>

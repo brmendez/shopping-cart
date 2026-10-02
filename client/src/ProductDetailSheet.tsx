@@ -1,12 +1,17 @@
+import { useState } from 'react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
+  SheetDescription,
+  SheetFooter,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { formatPrice } from '@/lib/formatPrice';
 import { getStockStatus } from '@/lib/stockStatus';
 import { useCart } from './hooks/useCart';
+import { ProductGallery } from './ProductGallery';
 import type { Product } from './types';
 
 type ProductDetailSheetProps = {
@@ -19,28 +24,83 @@ export const ProductDetailSheet = ({
   product,
   onClose,
 }: ProductDetailSheetProps) => {
-  const { addToCart, loading } = useCart();
+  const { addToCart, loading, error } = useCart();
+  const [adding, setAdding] = useState(false);
 
-  const soldOut = product
-    ? getStockStatus(product.stock) === 'sold-out'
-    : false;
+  // Keep the last product so the content stays put while the sheet slides out.
+  const [shown, setShown] = useState<Product | null>(product);
+  if (product && product !== shown) setShown(product);
+
+  const status = shown ? getStockStatus(shown.stock) : 'in-stock';
+  const soldOut = status === 'sold-out';
+
+  const handleAdd = async () => {
+    if (!shown) return;
+    setAdding(true);
+    try {
+      await addToCart(shown.id);
+    } finally {
+      setAdding(false);
+    }
+  };
 
   return (
     <Sheet open={product !== null} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent showCloseButton className="w-full sm:max-w-md">
-        {product && (
+      <SheetContent showCloseButton className="w-full gap-0 p-0 sm:max-w-md">
+        {shown && (
           <>
-            <SheetHeader>
-              <SheetTitle>{product.title}</SheetTitle>
-            </SheetHeader>
-            <div className="px-4">
-              <Button
-                onClick={() => addToCart(product.id)}
-                disabled={loading || soldOut}
-              >
-                {soldOut ? 'Sold out' : 'Add to cart'}
-              </Button>
+            <div className="flex-1 overflow-y-auto p-5 pt-14">
+              <ProductGallery key={shown.id} product={shown} dimmed={soldOut} />
+              <p className="mt-6 text-xs text-muted-foreground capitalize">
+                {shown.category}
+              </p>
+              <div className="mt-1 flex items-start justify-between gap-4">
+                <SheetTitle className="text-xl leading-snug font-semibold tracking-tight">
+                  {shown.title}
+                </SheetTitle>
+                <p className="text-xl leading-snug font-semibold tabular-nums">
+                  {formatPrice(shown.price)}
+                </p>
+              </div>
+              {status === 'in-stock' && (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {shown.stock} left
+                </p>
+              )}
+              {status === 'low' && (
+                <p className="mt-3 inline-block rounded-full bg-rose-soft px-2.5 py-1 text-xs font-medium text-rose-foreground">
+                  Low stock — {shown.stock} left
+                </p>
+              )}
+              {soldOut && (
+                <p className="mt-3 inline-block rounded-full bg-rose-soft px-2.5 py-1 text-xs font-medium text-rose-foreground">
+                  Sold out
+                </p>
+              )}
+              <SheetDescription className="mt-5 text-[15px] leading-relaxed">
+                {shown.description}
+              </SheetDescription>
             </div>
+            <SheetFooter className="border-t px-5 py-5">
+              {error && (
+                <div
+                  role="alert"
+                  className="mb-2 flex items-start gap-2 rounded-lg bg-muted px-3 py-2.5 text-sm"
+                >
+                  <AlertCircle className="mt-0.5 size-4 shrink-0 text-destructive" />
+                  {error}
+                </div>
+              )}
+              <Button
+                className="h-11 w-full rounded-full"
+                onClick={handleAdd}
+                disabled={loading || soldOut}
+                aria-busy={adding}
+              >
+                {adding && <Loader2 className="animate-spin" />}
+                {soldOut ? 'Sold out' : adding ? 'Adding' : 'Add to cart'}
+              </Button>
+            </SheetFooter>
           </>
         )}
       </SheetContent>
