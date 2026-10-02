@@ -4,15 +4,22 @@ import { Button } from '@/components/ui/button';
 import { useCart } from './hooks/useCart';
 import { useCountdown } from './hooks/useCountdown';
 import { useProducts } from './hooks/useProducts';
-import { formatCountdown } from '@/lib/formatCountdown';
+import { Hero } from './Hero';
 import { ProductCard } from './ProductCard';
 import { ProductDetailSheet } from './ProductDetailSheet';
 
 export const ProductsPage = () => {
   const { addToCart, loading, stockVersion } = useCart();
 
-  const { products, page, totalPages, nextPage, prevPage, nextRestockAt } =
-    useProducts(stockVersion);
+  const {
+    products,
+    page,
+    totalPages,
+    nextPage,
+    prevPage,
+    nextRestockAt,
+    scarce,
+  } = useProducts(stockVersion);
   const restockIn = useCountdown(nextRestockAt);
 
   // Store the id, not the product, so the sheet always shows the latest loaded data.
@@ -21,25 +28,7 @@ export const ProductsPage = () => {
 
   return (
     <>
-      <section className="mt-6 flex flex-col gap-6 rounded-2xl bg-teal px-6 py-7 text-teal-foreground sm:mt-8 sm:flex-row sm:items-end sm:justify-between sm:px-10 sm:py-9">
-        <h1 className="max-w-xl text-3xl leading-[1.05] font-semibold tracking-tighter sm:text-4xl">
-          A little of everything, restocked every five minutes.
-        </h1>
-        {restockIn !== null && (
-          <div className="sm:text-right">
-            <p className="flex items-center gap-2 text-xs font-medium tracking-wide uppercase opacity-80 sm:justify-end">
-              <span className="size-1.5 rounded-full bg-teal-foreground motion-safe:animate-pulse" />
-              {restockIn === 0 ? 'Restocking' : 'Next drop in'}
-            </p>
-            <p
-              aria-live="off"
-              className="mt-1 text-5xl leading-none font-semibold tracking-tighter tabular-nums sm:text-6xl"
-            >
-              {restockIn === 0 ? '…' : formatCountdown(restockIn)}
-            </p>
-          </div>
-        )}
-      </section>
+      <Hero restockIn={restockIn} scarce={scarce} />
       <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:mt-10 lg:grid-cols-4 lg:gap-x-6">
         {products.map((p) => (
           <ProductCard
