@@ -1,6 +1,8 @@
 import { ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useCart } from './hooks/useCart';
+import { ShoppingCart } from './ShoppingCart';
 
 export const Header = () => {
   const { cart } = useCart();
@@ -12,14 +14,26 @@ export const Header = () => {
         <a href="/" className="text-lg font-semibold tracking-tight">
           Provisions
         </a>
-        <Button
-          variant="outline"
-          className="h-10 rounded-full px-4"
-          aria-label={`Cart, ${count} items`}
-        >
-          <ShoppingBag />
-          <span className="tabular-nums">{count}</span>
-        </Button>
+        <Sheet>
+          <SheetTrigger
+            render={
+              <Button
+                variant="outline"
+                className="h-10 rounded-full px-4 hover:border-foreground/30"
+                aria-label={`Open cart, ${count} items`}
+              />
+            }
+          >
+            <ShoppingBag />
+            <span className="tabular-nums">{count}</span>
+          </SheetTrigger>
+          <SheetContent
+            showCloseButton
+            className="w-full gap-0 p-0 sm:max-w-md"
+          >
+            <ShoppingCart />
+          </SheetContent>
+        </Sheet>
       </div>
     </header>
   );
