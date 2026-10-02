@@ -1,7 +1,8 @@
 import { useCart } from './hooks/useCart';
 
 export const ShoppingCart = () => {
-  const { cart, loading, error, updateQuantity, removeFromCart } = useCart();
+  const { cart, loading, error, order, updateQuantity, removeFromCart, checkout } =
+    useCart();
 
   const total = cart.reduce((sum, item) => sum + item.products.price * item.quantity, 0);
 
@@ -9,6 +10,20 @@ export const ShoppingCart = () => {
     <div>
       <h2>Cart</h2>
       {error && <p>{error}</p>}
+      {order && (
+        <div>
+          <p>
+            Order #{order.id} {order.status} — ${order.total}
+          </p>
+          <ul>
+            {order.order_items.map((item) => (
+              <li key={item.product_id}>
+                {item.quantity} × {item.title} ${item.unit_price}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {cart.length === 0 ? (
         <p>Your cart is empty</p>
       ) : (
@@ -37,6 +52,9 @@ export const ShoppingCart = () => {
         </ul>
       )}
       <p>Total: ${total.toFixed(2)}</p>
+      <button onClick={checkout} disabled={loading || cart.length === 0}>
+        Checkout
+      </button>
     </div>
   );
 };
