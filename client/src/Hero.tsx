@@ -9,10 +9,12 @@ type HeroProps = {
   restockIn: number | null;
   // Products that start tiny and sell out, shown as "Going fast".
   scarce: Product[];
+  // Opens a product's detail sheet.
+  onSelect: (productId: number) => void;
 };
 
 // Top of the page: headline and restock countdown on the left, scarce items on the right.
-export const Hero = ({ restockIn, scarce }: HeroProps) => {
+export const Hero = ({ restockIn, scarce, onSelect }: HeroProps) => {
   return (
     <section className="mt-6 grid overflow-hidden rounded-2xl bg-secondary sm:mt-8 sm:grid-cols-[1.1fr_1fr]">
       <div className="flex flex-col justify-between gap-6 px-6 py-7 sm:px-10 sm:py-9">
@@ -41,19 +43,28 @@ export const Hero = ({ restockIn, scarce }: HeroProps) => {
         <ul className="mt-3 grid grid-cols-4 gap-3">
           {scarce.map((p) => (
             <li key={p.id}>
-              <div className="aspect-square overflow-hidden rounded-lg bg-background">
-                <img
-                  src={p.thumbnail}
-                  alt=""
-                  className="size-full object-contain p-2"
-                />
-              </div>
-              <p className="mt-1.5 truncate text-xs">{p.title}</p>
-              <p className="text-xs text-rose-foreground">
-                {getStockStatus(p.stock) === 'sold-out'
-                  ? 'Sold out'
-                  : `${p.stock} left`}
-              </p>
+              <button
+                type="button"
+                onClick={() => onSelect(p.id)}
+                aria-label={`View ${p.title}`}
+                className="group/item block w-full cursor-pointer rounded-lg text-left outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-secondary"
+              >
+                <div className="aspect-square overflow-hidden rounded-lg bg-background">
+                  <img
+                    src={p.thumbnail}
+                    alt=""
+                    className="size-full object-contain p-2 transition-transform duration-300 ease-out group-hover/item:scale-[1.06] motion-reduce:transition-none"
+                  />
+                </div>
+                <p className="mt-1.5 truncate text-xs underline-offset-4 group-hover/item:underline">
+                  {p.title}
+                </p>
+                <p className="text-xs text-rose-foreground">
+                  {getStockStatus(p.stock) === 'sold-out'
+                    ? 'Sold out'
+                    : `${p.stock} left`}
+                </p>
+              </button>
             </li>
           ))}
         </ul>

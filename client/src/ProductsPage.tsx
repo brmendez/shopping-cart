@@ -24,11 +24,13 @@ export const ProductsPage = () => {
 
   // Store the id, not the product, so the sheet always shows the latest loaded data.
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const selectedProduct = products.find((p) => p.id === selectedId) ?? null;
+  // Hero items may be on another page, so look in the scarce list too.
+  const selectedProduct =
+    [...products, ...scarce].find((p) => p.id === selectedId) ?? null;
 
   return (
     <>
-      <Hero restockIn={restockIn} scarce={scarce} />
+      <Hero restockIn={restockIn} scarce={scarce} onSelect={setSelectedId} />
       <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:mt-10 lg:grid-cols-4 lg:gap-x-6">
         {products.map((p) => (
           <ProductCard
