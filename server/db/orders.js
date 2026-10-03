@@ -1,17 +1,6 @@
 const { supabaseAdmin } = require('../lib/supabaseAdmin');
 const { stripe } = require('../lib/stripe');
 
-// Stock check, stock decrease, order + cart cleanup all happen in the checkout DB function.
-async function checkout(cartId) {
-  const { error, data: orderId } = await supabaseAdmin.rpc('checkout', {
-    p_cart_id: cartId,
-  });
-
-  if (error) throw error;
-
-  return getOrder(orderId);
-}
-
 async function getOrder(orderId) {
   const { error, data } = await supabaseAdmin
     .from('orders')
@@ -170,7 +159,6 @@ async function confirmOrder(orderId, cartId) {
 }
 
 module.exports = {
-  checkout,
   getOrder,
   createCheckoutSession,
   getOrderForCart,

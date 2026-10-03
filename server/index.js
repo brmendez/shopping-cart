@@ -22,7 +22,6 @@ const {
   getCart,
 } = require('./db/cart');
 const {
-  checkout,
   createCheckoutSession,
   getOrderForCart,
   confirmOrder,
@@ -140,25 +139,6 @@ app.delete('/api/cart/:cartId/items/:productId', async (req, res) => {
     const cart = await removeFromCart(cartId, productId);
     res.json({ cart });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post('/api/checkout', async (req, res) => {
-  const { cartId } = req.body ?? {};
-
-  if (!UUID_PATTERN.test(cartId)) {
-    return res.status(400).json({ error: 'cartId must be a UUID' });
-  }
-
-  try {
-    const order = await checkout(cartId);
-    res.status(201).json({ order });
-  } catch (err) {
-    if (err.code === CART_EMPTY) return res.status(400).json({ error: err.message });
-    if (err.code === OUT_OF_STOCK) return res.status(409).json({ error: err.message });
-
     console.error(err);
     res.status(500).json({ error: err.message });
   }

@@ -137,70 +137,6 @@ begin
 end;
 $$;
 
--- Turns a cart into a paid order: checks stock, lowers it, saves the order,
--- empties the cart. Any failure leaves everything unchanged.
-create function public.checkout(p_cart_id uuid)
-returns bigint
-language plpgsql
-set search_path = ''
-as $$
-declare
-  v_item_ids bigint[];
-  v_short record;
-  v_order_id bigint;
-begin
-  -- Lock this cart's lines so their quantities can't change mid-checkout.
-  select array_agg(id) into v_item_ids
-  from (
-    select id from public.cart_items
-    where cart_id = p_cart_id
-    for update
-  ) locked;
-
-  if v_item_ids is null then
-    raise exception 'Cart is empty' using errcode = '22023';
-  end if;
-
-  -- Lock the products (in id order, to avoid deadlocks between buyers).
-  perform 1 from public.products
-  where id in (select product_id from public.cart_items where id = any(v_item_ids))
-  order by id
-  for update;
-
-  select p.title, coalesce(p.stock, 0) as stock into v_short
-  from public.cart_items ci
-  join public.products p on p.id = ci.product_id
-  where ci.id = any(v_item_ids) and ci.quantity > coalesce(p.stock, 0)
-  limit 1;
-
-  if found then
-    raise exception 'Only % left of "%"', v_short.stock, v_short.title using errcode = 'P0001';
-  end if;
-
-  update public.products p
-  set stock = p.stock - ci.quantity
-  from public.cart_items ci
-  where ci.id = any(v_item_ids) and p.id = ci.product_id;
-
-  insert into public.orders (cart_id, total, status)
-  select p_cart_id, round(sum(p.price * ci.quantity), 2), 'paid'
-  from public.cart_items ci
-  join public.products p on p.id = ci.product_id
-  where ci.id = any(v_item_ids)
-  returning id into v_order_id;
-
-  insert into public.order_items (order_id, product_id, title, unit_price, quantity)
-  select v_order_id, p.id, p.title, p.price, ci.quantity
-  from public.cart_items ci
-  join public.products p on p.id = ci.product_id
-  where ci.id = any(v_item_ids);
-
-  delete from public.cart_items where id = any(v_item_ids);
-
-  return v_order_id;
-end;
-$$;
-
 -- Saves a pending order from the cart at current prices. Checks stock but
 -- doesn't lower it or empty the cart (finalize_order does that after payment).
 create function public.create_pending_order(p_cart_id uuid)
@@ -361,7 +297,6 @@ grant select on table public.restock_settings to service_role;
 revoke execute on function
   public.add_to_cart(uuid, integer, integer),
   public.set_cart_quantity(uuid, integer, integer),
-  public.checkout(uuid),
   public.create_pending_order(uuid),
   public.finalize_order(bigint),
   public.next_restock_at(),
@@ -371,7 +306,6 @@ from public, anon, authenticated;
 grant execute on function
   public.add_to_cart(uuid, integer, integer),
   public.set_cart_quantity(uuid, integer, integer),
-  public.checkout(uuid),
   public.create_pending_order(uuid),
   public.finalize_order(bigint),
   public.next_restock_at()
