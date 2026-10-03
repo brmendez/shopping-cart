@@ -1,5 +1,5 @@
 // src/CheckoutPage.tsx
-import { ArrowLeft, ShoppingBag } from 'lucide-react';
+import { AlertCircle, ArrowLeft, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { CheckoutSummary } from './CheckoutSummary';
@@ -64,20 +64,49 @@ export const CheckoutPage = () => {
             >
               Payment
             </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Card details are entered here.
-            </p>
+            <div className="mt-4 rounded-lg border border-dashed border-foreground/20 bg-background px-3.5 py-3 text-sm">
+              <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                Test mode
+              </p>
+              <p className="mt-1">
+                Card{' '}
+                <span className="font-mono font-medium tabular-nums">
+                  4242 4242 4242 4242
+                </span>
+                , any future date, any CVC.
+              </p>
+            </div>
             <div className="mt-6">
               {error ? (
-                <p role="alert">
-                  {error} <Link to="/">Back to shop</Link>
-                </p>
+                <div role="alert" className="rounded-lg bg-background p-4">
+                  <p className="flex items-start gap-2 text-sm">
+                    <AlertCircle className="mt-0.5 size-4 shrink-0 text-destructive" />
+                    {error}
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="mt-4 h-11 w-full rounded-full"
+                    render={<Link to="/" />}
+                    nativeButton={false}
+                  >
+                    Back to shop
+                  </Button>
+                </div>
               ) : session ? (
                 <PaymentForm session={session} />
               ) : (
-                <p className="text-sm text-muted-foreground">
-                  Loading payment…
-                </p>
+                <div
+                  aria-busy="true"
+                  aria-label="Loading payment"
+                  className="space-y-3 motion-safe:animate-pulse"
+                >
+                  <div className="h-11 rounded-lg bg-background" />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="h-11 rounded-lg bg-background" />
+                    <div className="h-11 rounded-lg bg-background" />
+                  </div>
+                  <div className="h-11 rounded-full bg-foreground/10" />
+                </div>
               )}
             </div>
           </section>
