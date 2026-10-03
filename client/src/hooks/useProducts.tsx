@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router';
 import { API_URL } from '@/lib/api';
 import type { Product, ProductsResponse } from '../types';
 
@@ -8,34 +9,16 @@ const RESTOCK_BUFFER_MS = 2000;
 // Never reload more often than this, even if the restock time has already passed.
 const MIN_RELOAD_DELAY_MS = 5000;
 
-// Reads ?page= from the URL, falling back to 1.
-const getPageFromUrl = () =>
-  Math.max(1, Number(new URLSearchParams(window.location.search).get('page')) || 1);
-
 // refreshKey: change it to reload the current page (e.g. after stock changes).
 export const useProducts = (refreshKey: number) => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [page, setPage] = useState(getPageFromUrl);
+  // The page lives in the URL (?page=N), so refresh, links and back/forward all work.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = Math.max(1, Number(searchParams.get('page')) || 1);
   const [total, setTotal] = useState(0);
   const [nextRestockAt, setNextRestockAt] = useState<string | null>(null);
   const [scarce, setScarce] = useState<Product[]>([]);
   const [restockTick, setRestockTick] = useState(0);
-
-  // Keeps the URL in sync so refresh and shared links land on the same page.
-  useEffect(() => {
-    if (getPageFromUrl() !== page) {
-      window.history.pushState(null, '', `?page=${page}`);
-    }
-  }, [page]);
-
-  // Back/forward buttons change the URL, so follow it.
-  useEffect(() => {
-    const onPopState = () => setPage(getPageFromUrl());
-
-    window.addEventListener('popstate', onPopState);
-
-    return () => window.removeEventListener('popstate', onPopState);
-  }, []);
 
   useEffect(() => {
     const getProducts = async () => {
@@ -70,6 +53,8 @@ export const useProducts = (refreshKey: number) => {
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
+  const goToPage = (next: number) => setSearchParams({ page: String(next) });
+
   return {
     products,
     page,
@@ -77,7 +62,7 @@ export const useProducts = (refreshKey: number) => {
     total,
     nextRestockAt,
     scarce,
-    nextPage: () => setPage((p) => Math.min(p + 1, totalPages)),
-    prevPage: () => setPage((p) => Math.max(p - 1, 1)),
+    nextPage: () => goToPage(Math.min(page + 1, totalPages)),
+    prevPage: () => goToPage(Math.max(page - 1, 1)),
   };
 };
