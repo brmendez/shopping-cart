@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
+@import './shadcn.css';
 
 /* Design tokens: warm-neutral monochrome, black as the only accent. */
 :root {
