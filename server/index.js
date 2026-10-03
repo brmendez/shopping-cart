@@ -21,7 +21,12 @@ const {
   removeFromCart,
   getCart,
 } = require('./db/cart');
-const { checkout, createCheckoutSession } = require('./db/orders');
+const {
+  checkout,
+  createCheckoutSession,
+  getOrderForCart,
+  confirmOrder,
+} = require('./db/orders');
 const { OUT_OF_STOCK, NOT_FOUND, CART_EMPTY } = require('./lib/dbErrorCodes');
 
 app.get('/api/products', async (req, res) => {
@@ -173,6 +178,56 @@ app.post('/api/checkout/session', async (req, res) => {
     if (err.code === CART_EMPTY) return res.status(400).json({ error: err.message });
     if (err.code === OUT_OF_STOCK) return res.status(409).json({ error: err.message });
 
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/orders/:orderId/confirm', async (req, res) => {
+  const orderId = Number(req.params.orderId);
+  const { cartId } = req.body ?? {};
+
+  if (!Number.isInteger(orderId) || orderId < 1) {
+    return res.status(400).json({ error: 'orderId must be a positive integer' });
+  }
+  if (!UUID_PATTERN.test(cartId)) {
+    return res.status(400).json({ error: 'cartId must be a UUID' });
+  }
+
+  try {
+    const { order, status, body } = await confirmOrder(orderId, cartId);
+
+    if (!order) {
+      return res.status(status).json(body);
+    }
+
+    res.json({ order });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/orders/:orderId', async (req, res) => {
+  const orderId = Number(req.params.orderId);
+  const { cartId } = req.query;
+
+  if (!Number.isInteger(orderId) || orderId < 1) {
+    return res.status(400).json({ error: 'orderId must be a positive integer' });
+  }
+  if (!UUID_PATTERN.test(cartId)) {
+    return res.status(400).json({ error: 'cartId must be a UUID' });
+  }
+
+  try {
+    const order = await getOrderForCart(orderId, cartId);
+
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    res.json({ order });
+  } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
