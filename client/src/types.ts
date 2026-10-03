@@ -28,7 +28,7 @@ export type CartItem = {
 export type Order = {
   id: number;
   total: number;
-  status: 'pending' | 'paid';
+  status: 'pending' | 'paid' | 'refunded';
   created_at: string;
   order_items: {
     product_id: number;
