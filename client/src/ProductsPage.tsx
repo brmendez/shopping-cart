@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from './hooks/useCart';
 import { useCountdown } from './hooks/useCountdown';
@@ -33,7 +33,12 @@ export const ProductsPage = () => {
 
   return (
     <>
-      <Hero restockIn={restockIn} scarce={scarce} onSelect={setSelectedId} />
+      <Hero
+        restockIn={restockIn}
+        scarce={scarce}
+        onSelect={setSelectedId}
+        status={status}
+      />
       {status === 'ready' ? (
         <>
           <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:mt-10 lg:grid-cols-4 lg:gap-x-6">
@@ -74,23 +79,46 @@ export const ProductsPage = () => {
           </nav>
         </>
       ) : status === 'loading' ? (
-        <div className="mt-10" aria-busy="true">
-          <p className="text-sm text-muted-foreground">
-            {slow
-              ? 'Waking up the server… Free hosting naps when idle, so this takes about 30 seconds.'
-              : 'Loading products…'}
-          </p>
+        <div aria-busy="true">
+          {slow && (
+            <p
+              role="status"
+              className="mt-6 flex items-center gap-2 text-sm text-muted-foreground"
+            >
+              <span className="size-1.5 shrink-0 rounded-full bg-teal motion-safe:animate-pulse" />
+              Waking up the server. Free hosting naps when idle, so this takes
+              about 30 seconds.
+            </p>
+          )}
+          <div
+            aria-hidden="true"
+            className={`${slow ? 'mt-6' : 'mt-8 sm:mt-10'} grid grid-cols-2 gap-x-4 gap-y-10 motion-safe:animate-pulse lg:grid-cols-4 lg:gap-x-6`}
+          >
+            {Array.from({ length: 4 }, (_, i) => (
+              <div key={i}>
+                <div className="aspect-square rounded-xl bg-muted" />
+                <div className="mt-4 h-3 w-1/4 rounded-full bg-muted" />
+                <div className="mt-2 h-4 w-3/4 rounded-full bg-muted" />
+                <div className="mt-8 h-11 rounded-full bg-muted sm:h-10" />
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
-        <div className="mt-10" role="alert">
-          <p className="text-sm text-muted-foreground">
-            Couldn&apos;t load the shop. The server may still be starting.
+        <div
+          role="alert"
+          className="mt-8 flex flex-col items-center rounded-2xl bg-muted px-6 py-14 text-center sm:mt-10"
+        >
+          <div className="flex size-12 items-center justify-center rounded-full bg-background">
+            <AlertCircle className="size-5 text-destructive" />
+          </div>
+          <p className="mt-4 text-lg font-semibold tracking-tight">
+            Couldn&apos;t load the shop
           </p>
-          <Button
-            variant="outline"
-            className="mt-3 rounded-full"
-            onClick={retry}
-          >
+          <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+            The server may still be starting. Give it a moment and try again.
+          </p>
+          <Button className="mt-6 h-11 rounded-full px-6" onClick={retry}>
             Try again
           </Button>
         </div>

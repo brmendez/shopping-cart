@@ -11,16 +11,30 @@ type HeroProps = {
   scarce: Product[];
   // Opens a product's detail sheet.
   onSelect: (productId: number) => void;
+  // Until products arrive, show quiet placeholders instead of empty space.
+  status: 'loading' | 'error' | 'ready';
 };
 
 // Top of the page: headline and restock countdown on the left, scarce items on the right.
-export const Hero = ({ restockIn, scarce, onSelect }: HeroProps) => {
+export const Hero = ({ restockIn, scarce, onSelect, status }: HeroProps) => {
+  const pending = status !== 'ready';
+  const pulse = status === 'loading' ? 'motion-safe:animate-pulse' : '';
+
   return (
     <section className="mt-6 grid overflow-hidden rounded-2xl bg-secondary sm:mt-8 sm:grid-cols-[1.1fr_1fr]">
       <div className="flex flex-col justify-between gap-6 px-6 py-7 sm:px-10 sm:py-9">
         <h1 className="max-w-md text-2xl leading-[1.05] font-semibold tracking-tighter sm:text-3xl">
           {HERO_HEADLINE}
         </h1>
+        {restockIn === null && pending && (
+          <div
+            aria-hidden="true"
+            className={`flex items-center gap-4 ${pulse}`}
+          >
+            <div className="h-[3.25rem] w-28 rounded-xl bg-foreground/10" />
+            <div className="h-3 w-28 rounded-full bg-foreground/10" />
+          </div>
+        )}
         {restockIn !== null && (
           <div className="flex items-center gap-4">
             <p
@@ -41,6 +55,15 @@ export const Hero = ({ restockIn, scarce, onSelect }: HeroProps) => {
           Going fast
         </p>
         <ul className="mt-3 grid grid-cols-4 gap-3">
+          {scarce.length === 0 &&
+            pending &&
+            Array.from({ length: 4 }, (_, i) => (
+              <li key={i} aria-hidden="true" className={pulse}>
+                <div className="aspect-square rounded-lg bg-background" />
+                <div className="mt-1.5 h-3 w-4/5 rounded-full bg-foreground/10" />
+                <div className="mt-1 h-3 w-1/2 rounded-full bg-foreground/10" />
+              </li>
+            ))}
           {scarce.map((p) => (
             <li key={p.id}>
               <button
