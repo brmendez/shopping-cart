@@ -3,10 +3,13 @@ import { ArrowLeft, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { CheckoutSummary } from './CheckoutSummary';
+import { useCheckoutSession } from './hooks/useCheckoutSession';
+import { PaymentForm } from './PaymentForm';
 import { useCart } from './hooks/useCart';
 
 export const CheckoutPage = () => {
   const { cart } = useCart();
+  const { session, error } = useCheckoutSession(cart.length > 0);
 
   return (
     <div className="pt-8 sm:pt-12">
@@ -64,9 +67,18 @@ export const CheckoutPage = () => {
             <p className="mt-1 text-sm text-muted-foreground">
               Card details are entered here.
             </p>
-            {/* Payment form goes here. */}
-            <div className="mt-6 flex min-h-40 items-center justify-center rounded-xl border border-dashed border-foreground/20 px-4 text-center text-sm text-muted-foreground">
-              Payment form coming soon
+            <div className="mt-6">
+              {error ? (
+                <p role="alert">
+                  {error} <Link to="/">Back to shop</Link>
+                </p>
+              ) : session ? (
+                <PaymentForm session={session} />
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Loading payment…
+                </p>
+              )}
             </div>
           </section>
         </div>

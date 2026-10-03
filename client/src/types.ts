@@ -37,3 +37,10 @@ export type Order = {
     quantity: number;
   }[];
 };
+
+// What the server returns when checkout starts: a pending order and its Stripe payment.
+export type CheckoutSession = {
+  orderId: number;
+  clientSecret: string;
+  order: Order;
+};

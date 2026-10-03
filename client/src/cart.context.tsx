@@ -1,21 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { CartContext } from './hooks/useCart';
 import { API_URL } from '@/lib/api';
+import { getCartId } from '@/lib/cartId';
 import type { CartItem } from './types';
-
-const CART_ID_KEY = 'cartId';
-
-// One random cart per browser until we have real users.
-const getCartId = () => {
-  let cartId = localStorage.getItem(CART_ID_KEY);
-
-  if (!cartId) {
-    cartId = crypto.randomUUID();
-    localStorage.setItem(CART_ID_KEY, cartId);
-  }
-
-  return cartId;
-};
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
