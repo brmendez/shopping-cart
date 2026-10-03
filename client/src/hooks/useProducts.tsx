@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_URL } from '@/lib/api';
 import type { Product, ProductsResponse } from '../types';
 
 const PAGE_SIZE = 4;
@@ -39,7 +40,7 @@ export const useProducts = (refreshKey: number) => {
   useEffect(() => {
     const getProducts = async () => {
       const res = await fetch(
-        `http://localhost:3001/api/products?limit=${PAGE_SIZE}&page=${page}`
+        `${API_URL}/products?limit=${PAGE_SIZE}&page=${page}`
       );
       const data: ProductsResponse = await res.json();
 
