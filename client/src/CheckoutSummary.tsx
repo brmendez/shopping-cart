@@ -13,10 +13,10 @@ export const CheckoutSummary = () => {
 
   return (
     <div>
-      <ul className="divide-y border-y">
+      <ul className="divide-y border-b">
         {cart.map((item) => (
-          <li key={item.product_id} className="flex gap-4 py-4">
-            <div className="size-16 shrink-0 overflow-hidden rounded-lg bg-muted">
+          <li key={item.product_id} className="flex gap-4 py-5">
+            <div className="size-20 shrink-0 overflow-hidden rounded-lg bg-muted">
               <img
                 src={item.products.thumbnail}
                 alt={item.products.title}
@@ -25,7 +25,7 @@ export const CheckoutSummary = () => {
             </div>
             <div className="flex min-w-0 flex-1 justify-between gap-3">
               <div className="min-w-0">
-                <p className="line-clamp-2 text-[15px] font-medium">
+                <p className="line-clamp-2 text-[15px] leading-snug font-medium">
                   {item.products.title}
                 </p>
                 <p className="text-sm text-muted-foreground tabular-nums">
@@ -39,10 +39,16 @@ export const CheckoutSummary = () => {
           </li>
         ))}
       </ul>
-      <p className="mt-4 flex justify-between text-base font-medium">
-        <span>Subtotal</span>
-        <span className="tabular-nums">{formatPrice(total)}</span>
-      </p>
+      <dl className="mt-5 space-y-2 text-sm">
+        <div className="flex justify-between text-muted-foreground">
+          <dt>Subtotal</dt>
+          <dd className="tabular-nums">{formatPrice(total)}</dd>
+        </div>
+        <div className="flex justify-between border-t pt-3 text-lg font-semibold tracking-tight">
+          <dt>Total</dt>
+          <dd className="tabular-nums">{formatPrice(total)}</dd>
+        </div>
+      </dl>
     </div>
   );
 };
