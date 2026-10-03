@@ -4,6 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
+		"start": "node index.js",
 		"dev": "nodemon --env-file-if-exists=.env index.js",
 		"seed": "nodemon --env-file-if-exists=.env db/seed.js",
 		"test": "echo \"Error: no test specified\" && exit 1"

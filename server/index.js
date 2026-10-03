@@ -5,7 +5,8 @@ const PORT = process.env.PORT || 3001;
 
 const supabase = require('./lib/supabase');
 
-app.use(cors());
+// Only the deployed site may call the API; locally (no CLIENT_ORIGIN) anything can.
+app.use(cors(process.env.CLIENT_ORIGIN ? { origin: process.env.CLIENT_ORIGIN } : undefined));
 
 app.use(express.json());
 
