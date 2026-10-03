@@ -8,7 +8,7 @@ import { getStockStatus } from '@/lib/stockStatus';
 
 type ProductProps = {
   product: Product;
-  onClick: (productId: number) => Promise<void>;
+  onClick: (productId: number) => Promise<boolean>;
   onSelect: (productId: number) => void;
   disabled: boolean;
   // Seconds until the next restock, shown on sold-out items.

@@ -11,8 +11,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   // Goes up whenever stock is known to have changed, so the product list can reload.
   const [stockVersion, setStockVersion] = useState(0);
 
-  // Cart endpoints answer with { cart }, failures with { error }.
-  const request = async (url: string, init?: RequestInit) => {
+  // Cart endpoints answer with { cart }, failures with { error }. Resolves true on success.
+  const request = async (url: string, init?: RequestInit): Promise<boolean> => {
     setLoading(true);
     setError(null);
 
@@ -30,12 +30,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         if (res.status === 409) {
           setStockVersion((v) => v + 1);
         }
-        return;
+        return false;
       }
 
       if (data.cart) setCart(data.cart);
+      return true;
     } catch {
       setError('Could not reach the server');
+      return false;
     } finally {
       setLoading(false);
     }

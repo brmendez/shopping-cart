@@ -6,9 +6,10 @@ type CartContextValue = {
   loading: boolean;
   error: string | null;
   stockVersion: number;
-  addToCart: (productId: number) => Promise<void>;
-  updateQuantity: (productId: number, quantity: number) => Promise<void>;
-  removeFromCart: (productId: number) => Promise<void>;
+  // Resolves true when the item was added, so the button can confirm it.
+  addToCart: (productId: number) => Promise<boolean>;
+  updateQuantity: (productId: number, quantity: number) => Promise<boolean>;
+  removeFromCart: (productId: number) => Promise<boolean>;
   refreshCart: () => Promise<void>;
 };
 
