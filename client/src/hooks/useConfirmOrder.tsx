@@ -9,6 +9,8 @@ export const useConfirmOrder = (orderId: string | undefined) => {
   const { refreshCart } = useCart();
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // True when Stripe says the payment never finished, so the user can go back and pay.
+  const [paymentIncomplete, setPaymentIncomplete] = useState(false);
   // Dev mode runs effects twice; one confirm per visit is enough.
   const started = useRef(false);
 
@@ -24,10 +26,12 @@ export const useConfirmOrder = (orderId: string | undefined) => {
       body: JSON.stringify({ cartId: getCartId() }),
     })
       .then(async (res) => {
-        const data: { order?: Order; error?: string } = await res.json();
+        const data: { order?: Order; error?: string; paymentStatus?: string } =
+          await res.json();
 
         if (!res.ok || !data.order) {
           setError(data.error ?? 'Could not load this order');
+          setPaymentIncomplete(data.paymentStatus !== undefined);
           return;
         }
         setOrder(data.order);
@@ -38,5 +42,5 @@ export const useConfirmOrder = (orderId: string | undefined) => {
       .catch(() => setError('Could not reach the server'));
   }, [orderId, refreshCart]);
 
-  return { order, error };
+  return { order, error, paymentIncomplete };
 };

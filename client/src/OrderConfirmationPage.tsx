@@ -61,7 +61,7 @@ const OrderItems = ({ order }: { order: Order }) => (
 // Shows the outcome of a payment.
 export const OrderConfirmationPage = () => {
   const { orderId } = useParams();
-  const { order, error } = useConfirmOrder(orderId);
+  const { order, error, paymentIncomplete } = useConfirmOrder(orderId);
 
   if (error) {
     return (
@@ -75,8 +75,7 @@ export const OrderConfirmationPage = () => {
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">{error}</p>
           <div className="mt-6 flex flex-col gap-2">
-            {/* The server words this one as "Payment not completed". */}
-            {/payment not completed/i.test(error) && (
+            {paymentIncomplete && (
               <Button
                 className="h-11 w-full rounded-full"
                 render={<Link to="/checkout" />}
