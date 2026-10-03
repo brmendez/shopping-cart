@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { CartContext } from './hooks/useCart';
 import { API_URL } from '@/lib/api';
-import type { CartItem, Order } from './types';
+import type { CartItem } from './types';
 
 const CART_ID_KEY = 'cartId';
 
@@ -21,22 +21,20 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [order, setOrder] = useState<Order | null>(null);
   // Goes up whenever stock is known to have changed, so the product list can reload.
   const [stockVersion, setStockVersion] = useState(0);
 
-  // Cart endpoints answer with { cart }, checkout with { order }, failures with { error }.
+  // Cart endpoints answer with { cart }, failures with { error }.
   const request = async (url: string, init?: RequestInit) => {
     setLoading(true);
     setError(null);
-    setOrder(null);
 
     try {
       const res = await fetch(url, {
         ...init,
         headers: { 'Content-Type': 'application/json' },
       });
-      const data: { cart?: CartItem[]; order?: Order; error?: string } = await res.json();
+      const data: { cart?: CartItem[]; error?: string } = await res.json();
 
       if (!res.ok) {
         setError(data.error ?? 'Something went wrong');
@@ -49,13 +47,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       }
 
       if (data.cart) setCart(data.cart);
-
-      // A finished checkout empties the cart on the server.
-      if (data.order) {
-        setOrder(data.order);
-        setCart([]);
-        setStockVersion((v) => v + 1);
-      }
     } catch {
       setError('Could not reach the server');
     } finally {
@@ -88,11 +79,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const removeFromCart = (productId: number) =>
     request(itemUrl(productId), { method: 'DELETE' });
 
-  const checkout = () =>
-    request(`${API_URL}/checkout`, {
-      method: 'POST',
-      body: JSON.stringify({ cartId: getCartId() }),
-    });
+  // Resync after payment: the server cart is emptied and stock has moved.
+  const refreshCart = async () => {
+    await request(`${API_URL}/cart/${getCartId()}`);
+    setStockVersion((v) => v + 1);
+  };
 
   return (
     <CartContext.Provider
@@ -100,12 +91,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         cart,
         loading,
         error,
-        order,
         stockVersion,
         addToCart,
         updateQuantity,
         removeFromCart,
-        checkout,
+        refreshCart,
       }}
     >
       {children}

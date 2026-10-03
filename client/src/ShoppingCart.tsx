@@ -1,11 +1,5 @@
-import {
-  AlertCircle,
-  Check,
-  Loader2,
-  Minus,
-  Plus,
-  ShoppingBag,
-} from 'lucide-react';
+import { AlertCircle, Loader2, Minus, Plus, ShoppingBag } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import { Button } from '@/components/ui/button';
 import {
   SheetClose,
@@ -17,15 +11,8 @@ import { useCart } from './hooks/useCart';
 import { formatPrice } from '@/lib/formatPrice';
 
 export const ShoppingCart = () => {
-  const {
-    cart,
-    loading,
-    error,
-    order,
-    updateQuantity,
-    removeFromCart,
-    checkout,
-  } = useCart();
+  const { cart, loading, error, updateQuantity, removeFromCart } = useCart();
+  const navigate = useNavigate();
 
   const total = cart.reduce(
     (sum, item) => sum + item.products.price * item.quantity,
@@ -36,7 +23,7 @@ export const ShoppingCart = () => {
     <>
       <SheetHeader className="border-b px-5 py-4">
         <SheetTitle className="flex items-center gap-2 text-lg font-semibold tracking-tight">
-          {order ? 'Order placed' : 'Your cart'}
+          Your cart
           {loading && (
             <Loader2 className="size-4 animate-spin text-muted-foreground" />
           )}
@@ -53,38 +40,7 @@ export const ShoppingCart = () => {
         </div>
       )}
 
-      {order ? (
-        <div className="flex flex-1 flex-col overflow-y-auto px-5 pt-6">
-          <div className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
-            <Check className="size-5" />
-          </div>
-          <p className="mt-4 text-xl font-semibold tracking-tight">
-            Thank you for your order
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Order #{order.id}
-          </p>
-          <ul className="mt-6 divide-y border-y text-sm">
-            {order.order_items.map((item) => (
-              <li
-                key={item.product_id}
-                className="flex justify-between gap-4 py-3"
-              >
-                <span>
-                  {item.quantity} × {item.title}
-                </span>
-                <span className="text-muted-foreground tabular-nums">
-                  {formatPrice(item.unit_price * item.quantity)}
-                </span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 flex justify-between font-medium">
-            <span>Total</span>
-            <span className="tabular-nums">{formatPrice(order.total)}</span>
-          </p>
-        </div>
-      ) : cart.length === 0 ? (
+      {cart.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center px-5 text-center">
           <div className="flex size-14 items-center justify-center rounded-full bg-muted">
             <ShoppingBag className="size-6 text-muted-foreground" />
@@ -162,28 +118,23 @@ export const ShoppingCart = () => {
       )}
 
       <SheetFooter className="border-t px-5 py-5">
-        {order ? (
-          <SheetClose render={<Button className="h-11 w-full rounded-full" />}>
-            Continue shopping
-          </SheetClose>
-        ) : (
-          <>
-            <p className="mb-2 flex justify-between text-base font-medium">
-              <span>Subtotal</span>
-              <span className="tabular-nums">{formatPrice(total)}</span>
-            </p>
+        <p className="mb-2 flex justify-between text-base font-medium">
+          <span>Subtotal</span>
+          <span className="tabular-nums">{formatPrice(total)}</span>
+        </p>
+        {/* A real button, so disabled works; SheetClose closes the drawer on click. */}
+        <SheetClose
+          render={
             <Button
               className="h-11 w-full rounded-full"
-              onClick={checkout}
               disabled={loading || cart.length === 0}
-            >
-              {loading && cart.length > 0 && (
-                <Loader2 className="animate-spin" />
-              )}
-              Checkout
-            </Button>
-          </>
-        )}
+              onClick={() => navigate('/checkout')}
+            />
+          }
+        >
+          {loading && cart.length > 0 && <Loader2 className="animate-spin" />}
+          Checkout
+        </SheetClose>
       </SheetFooter>
     </>
   );
