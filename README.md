@@ -4,7 +4,7 @@
 
 A small full-stack shop built around one idea: stock is real and it runs out. A few items start with only 3 units, so you can sell them out, watch the "Back in 1:42" countdown, and see them come back on the next drop. Checkout takes real (test-mode) card payments through Stripe.
 
-<!-- Live demo: add the Render URL here once deployed -->
+**Live demo: [provisions.onrender.com](https://provisions.onrender.com)** (free hosting, so the first load may take ~30 seconds while the server wakes up)
 
 ## Try it
 
