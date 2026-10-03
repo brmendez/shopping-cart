@@ -9,7 +9,7 @@ import { ProductCard } from './ProductCard';
 import { ProductDetailSheet } from './ProductDetailSheet';
 
 export const ProductsPage = () => {
-  const { addToCart, loading, stockVersion } = useCart();
+  const { stockVersion } = useCart();
 
   const {
     products,
@@ -36,9 +36,7 @@ export const ProductsPage = () => {
           <ProductCard
             key={p.id}
             product={p}
-            onClick={addToCart}
             onSelect={setSelectedId}
-            disabled={loading}
             restockIn={restockIn}
           />
         ))}

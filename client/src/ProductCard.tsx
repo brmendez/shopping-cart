@@ -1,6 +1,4 @@
-import { useState } from 'react';
-import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { AddToCartButton } from './AddToCartButton';
 import type { Product } from './types';
 import { formatPrice } from '@/lib/formatPrice';
 import { formatCountdown } from '@/lib/formatCountdown';
@@ -8,32 +6,14 @@ import { getStockStatus } from '@/lib/stockStatus';
 
 type ProductProps = {
   product: Product;
-  onClick: (productId: number) => Promise<boolean>;
   onSelect: (productId: number) => void;
-  disabled: boolean;
   // Seconds until the next restock, shown on sold-out items.
   restockIn: number | null;
 };
 
-export const ProductCard = ({
-  product,
-  onClick,
-  onSelect,
-  disabled,
-  restockIn,
-}: ProductProps) => {
-  const [adding, setAdding] = useState(false);
+export const ProductCard = ({ product, onSelect, restockIn }: ProductProps) => {
   const status = getStockStatus(product.stock);
   const soldOut = status === 'sold-out';
-
-  const handleClick = async () => {
-    setAdding(true);
-    try {
-      await onClick(product.id);
-    } finally {
-      setAdding(false);
-    }
-  };
 
   return (
     <article className="group flex flex-col">
@@ -85,15 +65,10 @@ export const ProductCard = ({
           {formatPrice(product.price)}
         </p>
       </div>
-      <Button
+      <AddToCartButton
+        product={product}
         className="h-11 w-full rounded-full text-sm sm:h-10"
-        onClick={handleClick}
-        disabled={disabled || soldOut}
-        aria-busy={adding}
-      >
-        {adding && <Loader2 className="animate-spin" />}
-        {soldOut ? 'Sold out' : adding ? 'Adding' : 'Add to cart'}
-      </Button>
+      />
     </article>
   );
 };

@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { AlertCircle, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { AlertCircle } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -11,6 +10,7 @@ import {
 import { formatPrice } from '@/lib/formatPrice';
 import { formatCountdown } from '@/lib/formatCountdown';
 import { getStockStatus } from '@/lib/stockStatus';
+import { AddToCartButton } from './AddToCartButton';
 import { useCart } from './hooks/useCart';
 import { ProductGallery } from './ProductGallery';
 import type { Product } from './types';
@@ -28,8 +28,7 @@ export const ProductDetailSheet = ({
   onClose,
   restockIn,
 }: ProductDetailSheetProps) => {
-  const { addToCart, loading, error } = useCart();
-  const [adding, setAdding] = useState(false);
+  const { error } = useCart();
 
   // Keep the last product so the content stays put while the sheet slides out.
   const [shown, setShown] = useState<Product | null>(product);
@@ -37,16 +36,6 @@ export const ProductDetailSheet = ({
 
   const status = shown ? getStockStatus(shown.stock) : 'in-stock';
   const soldOut = status === 'sold-out';
-
-  const handleAdd = async () => {
-    if (!shown) return;
-    setAdding(true);
-    try {
-      await addToCart(shown.id);
-    } finally {
-      setAdding(false);
-    }
-  };
 
   return (
     <Sheet open={product !== null} onOpenChange={(open) => !open && onClose()}>
@@ -103,15 +92,10 @@ export const ProductDetailSheet = ({
                   {error}
                 </div>
               )}
-              <Button
+              <AddToCartButton
+                product={shown}
                 className="h-11 w-full rounded-full"
-                onClick={handleAdd}
-                disabled={loading || soldOut}
-                aria-busy={adding}
-              >
-                {adding && <Loader2 className="animate-spin" />}
-                {soldOut ? 'Sold out' : adding ? 'Adding' : 'Add to cart'}
-              </Button>
+              />
             </SheetFooter>
           </>
         )}
